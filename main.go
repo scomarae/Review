@@ -21,6 +21,24 @@ func postAlbums(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, newAlbum)
 }
 
+// getAlbumByID находит альбом,
+// значение идентификатора которого совпадает с
+// параметром id, отправленным клиентом,
+// затем возвращает этот альбом в качестве ответа
+func getAlbumByID(c *gin.Context) {
+	id := c.Param("id")
+
+	// Перебираем список альбомов в поисках альбома,
+	// значение идентификатора которого соответствует параметру.
+	for _, a := range albums {
+		if a.ID == id {
+			c.IndentedJSON(http.StatusOK, a)
+			return
+		}
+	}
+	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
+}
+
 // album представляет данные об альбоме.
 type album struct {
 	ID     string  `json:"id"`
@@ -39,6 +57,7 @@ var albums = []album{
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
+	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbums)
 
 	router.Run("localhost:8080")
