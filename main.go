@@ -5,6 +5,22 @@ import (
 	"net/http"
 )
 
+// postAlbums добавляет альбом из JSON,
+// полученного в теле запроса.
+func postAlbums(c *gin.Context) {
+	var newAlbum album
+
+	// Вызов BindJSON для привязки
+	// полученного JSON к newAlbum
+	if err := c.BindJSON(&newAlbum); err != nil {
+		return
+	}
+
+	// Добавляем в срез новый альбом.
+	albums = append(albums, newAlbum)
+	c.IndentedJSON(http.StatusCreated, newAlbum)
+}
+
 // album представляет данные об альбоме.
 type album struct {
 	ID     string  `json:"id"`
@@ -23,6 +39,7 @@ var albums = []album{
 func main() {
 	router := gin.Default()
 	router.GET("/albums", getAlbums)
+	router.POST("/albums", postAlbums)
 
 	router.Run("localhost:8080")
 }
